@@ -24,6 +24,8 @@ pipeline {
         stage('Force Cleanup & Checkout') {
             steps {
                 script {
+                    // Force remove any existing containers with conflicting names
+                    sh 'docker rm -f taskflow_db taskflow_backend taskflow_frontend || true'
                     // Stop any existing containers and clean workspace
                     sh 'docker compose down || true'
                     sh 'docker run --rm -u 0:0 -v /var/lib/jenkins/workspace/Taskflow-A3-FINAL:/ws -w /ws markhobson/maven-chrome /bin/sh -c "rm -rf ./*"'
