@@ -25,6 +25,8 @@ pipeline {
                 dir('tests') {
                     // Execute the Maven test suite with local repo to avoid permission issues
                     sh 'mvn clean test -Dmaven.repo.local=.m2/repository -Dwdm.cachePath=.wdm'
+                    // Fix permissions so Jenkins can clean up the workspace later
+                    sh 'chmod -R 777 .'
                 }
             }
         }
