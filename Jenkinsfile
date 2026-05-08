@@ -2,7 +2,7 @@ pipeline {
     agent {
         node {
             label ""
-            customWorkspace "/var/lib/jenkins/workspace/Taskflow-A3-Fixed"
+            customWorkspace "/var/lib/jenkins/workspace/Taskflow-A3-FINAL"
         }
     }
 
@@ -16,30 +16,25 @@ pipeline {
     }
 
     stages {
-        stage('Checkout Code') {
+        stage('Automated Selenium Tests') {
             steps {
+                // 1. Clear everything
                 deleteDir()
+                // 2. Download code
                 checkout scm
-            }
-        }
-
-        stage('Run Automated Tests') {
-            agent {
-                docker {
-                    image 'markhobson/maven-chrome'
-                    // Force this stage to use the same fixed workspace
-                    customWorkspace "/var/lib/jenkins/workspace/Taskflow-A3-Fixed"
-                    args '-u 0:0 --network host --privileged --shm-size=2g' 
-                }
-            }
-            steps {
-                dir('tests') {
-                    sh 'mvn clean test -Dmaven.repo.local=.m2/repository -Dwdm.cachePath=.wdm'
+                
+                // 3. Run tests inside the Docker container
+                script {
+                    docker.image('markhobson/maven-chrome').inside('-u 0:0 --network host --privileged --shm-size=2g') {
+                        dir('tests') {
+                            sh 'mvn clean test -Dmaven.repo.local=.m2/repository -Dwdm.cachePath=.wdm'
+                        }
+                    }
                 }
             }
             post {
                 always {
-                    // Fix permissions so this workspace remains accessible
+                    // Fix permissions so we can clean up next time
                     sh 'chmod -R 777 . || true'
                 }
             }
