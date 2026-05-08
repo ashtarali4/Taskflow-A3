@@ -50,14 +50,18 @@ pipeline {
         always {
             script {
                 try {
+                    // Manually get the committer email from git to bypass Jenkins security restrictions
+                    def committerEmail = sh(script: "git show -s --format=%ae HEAD", returnStdout: true).trim()
+                    echo "Sending results to: ashtarali720@gmail.com and ${committerEmail}"
+                    
                     emailext (
                         subject: "Taskflow Build ${env.BUILD_NUMBER}: ${currentBuild.currentResult}",
                         body: "Build ${env.BUILD_NUMBER} finished with status ${currentBuild.currentResult}. Check console: ${env.BUILD_URL}",
-                        to: 'ashtarali720@gmail.com',
+                        to: "ashtarali720@gmail.com, ${committerEmail}",
                         recipientProviders: [culprits(), developers()]
                     )
                 } catch (Exception e) {
-                    echo "Email failed: ${e.message}"
+                    echo "Email failed or git not available: ${e.message}"
                 }
             }
         }
