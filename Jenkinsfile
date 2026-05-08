@@ -6,10 +6,17 @@ pipeline {
         TEST_URL = 'http://52.87.169.55'
     }
 
+    options {
+        // Skip automatic checkout so we can do it manually after clearing the directory
+        skipDefaultCheckout()
+    }
+
     stages {
         stage('Checkout Code') {
             steps {
-                git branch: 'main', url: 'https://github.com/ashtarali4/Taskflow-A3.git'
+                // Force clear the workspace to remove any root-owned files from previous builds
+                deleteDir()
+                checkout scm
             }
         }
         
