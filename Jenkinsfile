@@ -24,10 +24,21 @@ pipeline {
         stage('Force Cleanup & Checkout') {
             steps {
                 script {
-                    // Use Docker to delete root-owned files that Jenkins can't touch
+                    // Stop any existing containers and clean workspace
+                    sh 'docker-compose down || true'
                     sh 'docker run --rm -u 0:0 -v /var/lib/jenkins/workspace/Taskflow-A3-FINAL:/ws -w /ws markhobson/maven-chrome /bin/sh -c "rm -rf ./*"'
                 }
                 checkout scm
+            }
+        }
+        stage('Deploy Application') {
+            steps {
+                script {
+                    echo "Bringing the deployment up as per assignment requirements..."
+                    sh 'docker-compose up -d --build'
+                    echo "Waiting for services to stabilize..."
+                    sh 'sleep 20' // Give Postgres and Backend time to start
+                }
             }
         }
         stage('Automated Selenium Tests') {
@@ -35,7 +46,6 @@ pipeline {
                 timeout(time: 10, unit: 'MINUTES') 
             }
             steps {
-                
                 script {
                     docker.image('markhobson/maven-chrome').inside('-u 0:0 --network host --privileged --shm-size=2g') {
                         dir('tests') {
