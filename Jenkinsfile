@@ -24,7 +24,7 @@ pipeline {
             steps {
                 dir('tests') {
                     // Execute the Maven test suite with local repo to avoid permission issues
-                    sh 'mvn clean test -Dmaven.repo.local=.m2/repository'
+                    sh 'mvn clean test -Dmaven.repo.local=.m2/repository -Dwdm.cachePath=.wdm'
                 }
             }
         }
