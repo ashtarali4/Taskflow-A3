@@ -25,7 +25,7 @@ pipeline {
             steps {
                 script {
                     // Stop any existing containers and clean workspace
-                    sh 'docker-compose down || true'
+                    sh 'docker compose down || true'
                     sh 'docker run --rm -u 0:0 -v /var/lib/jenkins/workspace/Taskflow-A3-FINAL:/ws -w /ws markhobson/maven-chrome /bin/sh -c "rm -rf ./*"'
                 }
                 checkout scm
@@ -35,7 +35,7 @@ pipeline {
             steps {
                 script {
                     echo "Bringing the deployment up as per assignment requirements..."
-                    sh 'docker-compose up -d --build'
+                    sh 'docker compose up -d --build'
                     echo "Waiting for services to stabilize..."
                     sh 'sleep 20' // Give Postgres and Backend time to start
                 }
