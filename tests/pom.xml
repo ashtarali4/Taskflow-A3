@@ -43,6 +43,13 @@
             <version>5.6.3</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- Use JDK 11 HTTP client to avoid CDP mismatch issues and improve speed -->
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-http-jdk-client</artifactId>
+            <version>4.13.0</version>
+        </dependency>
     </dependencies>
 
     <build>
