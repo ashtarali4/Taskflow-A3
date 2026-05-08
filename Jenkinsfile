@@ -17,9 +17,9 @@ pipeline {
         stage('Deploy Pipeline Test Environment') {
             steps {
                 // Bring down any existing instances first
-                sh 'sudo docker compose -f docker-compose.ci.yml down || true'
+                sh 'docker compose -f docker-compose.ci.yml down || true'
                 // Bring up the containerized application
-                sh 'sudo docker compose -f docker-compose.ci.yml up -d'
+                sh 'docker compose -f docker-compose.ci.yml up -d'
                 
                 // Wait for the application to be fully up (Vite and FastAPI can take a few seconds)
                 sleep time: 10, unit: 'SECONDS'
@@ -46,7 +46,7 @@ pipeline {
     post {
         always {
             // Clean up the environment after tests
-            sh 'sudo docker compose -f docker-compose.ci.yml down || true'
+            sh 'docker compose -f docker-compose.ci.yml down || true'
             
             // Email the results
             script {
