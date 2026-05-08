@@ -14,6 +14,11 @@ pipeline {
         disableConcurrentBuilds()
     }
 
+    triggers {
+        // Check GitHub for changes every minute as a fallback for webhooks
+        pollSCM('* * * * *')
+    }
+
     stages {
         stage('Checkout Code') {
             steps {
