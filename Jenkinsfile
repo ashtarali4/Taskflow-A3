@@ -27,7 +27,7 @@ pipeline {
                 script {
                     docker.image('markhobson/maven-chrome').inside('-u 0:0 --network host --privileged --shm-size=2g') {
                         dir('tests') {
-                            sh 'mvn clean test -Dmaven.repo.local=.m2/repository -Dwdm.cachePath=.wdm'
+                            sh 'mvn clean test -Dmaven.repo.local=.m2/repository -Dwdm.cachePath=.wdm -Dsurefire.useFile=false'
                         }
                     }
                 }
