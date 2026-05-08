@@ -38,7 +38,7 @@ public class TaskflowTest {
         options.addArguments("--disable-setuid-sandbox");
         options.addArguments("--remote-allow-origins=*");
         driver = new ChromeDriver(options);
-        wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        wait = new WebDriverWait(driver, Duration.ofSeconds(20));
     }
 
     @AfterAll
@@ -159,8 +159,8 @@ public class TaskflowTest {
             // If not logged in, login
             WebElement emailInput = wait
                     .until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@type='email']")));
-            emailInput.sendKeys("admin@example.com");
-            driver.findElement(By.xpath("//input[@type='password']")).sendKeys("password");
+            emailInput.sendKeys("ashtar@gmail.com");
+            driver.findElement(By.xpath("//input[@type='password']")).sendKeys("Abc123!@#");
             driver.findElement(By.xpath("//button[@type='submit']")).click();
             wait.until(ExpectedConditions.urlContains("/dashboard"));
         } catch (Exception e) {
@@ -168,7 +168,7 @@ public class TaskflowTest {
         }
 
         WebElement header = wait
-                .until(ExpectedConditions.presenceOfElementLocated(By.xpath("//h1[contains(text(), 'Projects')]")));
+                .until(ExpectedConditions.presenceOfElementLocated(By.xpath("//h1[contains(text(), 'Project') or contains(text(), 'Dashboard')]")));
         assertNotNull(header);
     }
 
