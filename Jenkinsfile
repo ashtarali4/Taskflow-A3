@@ -9,6 +9,8 @@ pipeline {
     options {
         // Skip automatic checkout so we can do it manually after clearing the directory
         skipDefaultCheckout()
+        // Prevent multiple builds from running at once and locking the workspace
+        disableConcurrentBuilds()
     }
 
     stages {
