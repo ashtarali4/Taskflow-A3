@@ -20,13 +20,20 @@ pipeline {
     }
 
     stages {
+        stage('Force Cleanup & Checkout') {
+            steps {
+                script {
+                    // Use Docker to delete root-owned files that Jenkins can't touch
+                    sh 'docker run --rm -u 0:0 -v /var/lib/jenkins/workspace/Taskflow-A3-FINAL:/ws -w /ws markhobson/maven-chrome /bin/sh -c "rm -rf ./*"'
+                }
+                checkout scm
+            }
+        }
         stage('Automated Selenium Tests') {
             options {
                 timeout(time: 10, unit: 'MINUTES') 
             }
             steps {
-                deleteDir()
-                checkout scm
                 
                 script {
                     docker.image('markhobson/maven-chrome').inside('-u 0:0 --network host --privileged --shm-size=2g') {
