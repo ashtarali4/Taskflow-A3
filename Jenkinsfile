@@ -2,7 +2,6 @@ pipeline {
     agent {
         node {
             label ""
-            // Using a new workspace name to bypass the permission-locked folder
             customWorkspace "/var/lib/jenkins/workspace/Taskflow-A3-Fixed"
         }
     }
@@ -13,17 +12,13 @@ pipeline {
 
     options {
         disableConcurrentBuilds()
-    }
-
-    triggers {
-        // Check GitHub for changes every minute as a fallback for webhooks
-        pollSCM('* * * * *')
+        skipDefaultCheckout()
     }
 
     stages {
         stage('Checkout Code') {
             steps {
-                // Fresh checkout in the new folder
+                deleteDir()
                 checkout scm
             }
         }
@@ -32,7 +27,8 @@ pipeline {
             agent {
                 docker {
                     image 'markhobson/maven-chrome'
-                    // Run as root inside the container for Chrome permissions
+                    // Force this stage to use the same fixed workspace
+                    customWorkspace "/var/lib/jenkins/workspace/Taskflow-A3-Fixed"
                     args '-u 0:0 --network host --privileged --shm-size=2g' 
                 }
             }
@@ -43,7 +39,7 @@ pipeline {
             }
             post {
                 always {
-                    // Fix permissions so this new workspace doesn't get locked later
+                    // Fix permissions so this workspace remains accessible
                     sh 'chmod -R 777 . || true'
                 }
             }
