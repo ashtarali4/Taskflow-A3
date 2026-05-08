@@ -1,6 +1,7 @@
 pipeline {
     agent {
         node {
+            label ""
             // Using a new workspace name to bypass the permission-locked folder
             customWorkspace "/var/lib/jenkins/workspace/Taskflow-A3-Fixed"
         }
