@@ -117,11 +117,11 @@ public class TaskflowTest {
         WebElement passwordInput = driver.findElement(By.xpath("//input[@type='password']"));
         WebElement signUpBtn = driver.findElement(By.xpath("//button[@type='submit' and text()='Sign Up']"));
 
-        // Use a unique email to prevent duplication errors if run multiple times
-        String uniqueEmail = "testuser_" + System.currentTimeMillis() + "@example.com";
+        // Use the credentials that test6 and subsequent tests expect
+        String email = "ashtar@gmail.com";
         nameInput.sendKeys("Test User");
-        emailInput.sendKeys(uniqueEmail);
-        passwordInput.sendKeys("testpass123");
+        emailInput.sendKeys(email);
+        passwordInput.sendKeys("Abc123!@#");
         signUpBtn.click();
 
         WebElement successDiv = wait.until(
