@@ -12,7 +12,7 @@ pipeline {
     }
 
     environment {
-        TEST_URL = 'http://52.87.169.55'
+        TEST_URL = 'http://localhost'
     }
 
     options {
@@ -39,7 +39,7 @@ pipeline {
                     echo "Bringing the deployment up as per assignment requirements..."
                     sh 'docker compose up -d --build'
                     echo "Waiting for services to stabilize..."
-                    sh 'sleep 20' // Give Postgres and Backend time to start
+                    sh 'sleep 30' // Give Postgres and Backend time to start
                 }
             }
         }
