@@ -17,25 +17,19 @@ pipeline {
 
     stages {
         stage('Automated Selenium Tests') {
+            options {
+                timeout(time: 10, unit: 'MINUTES') 
+            }
             steps {
-                // 1. Clear everything
                 deleteDir()
-                // 2. Download code
                 checkout scm
                 
-                // 3. Run tests inside the Docker container
                 script {
                     docker.image('markhobson/maven-chrome').inside('-u 0:0 --network host --privileged --shm-size=2g') {
                         dir('tests') {
                             sh 'mvn clean test -Dmaven.repo.local=.m2/repository -Dwdm.cachePath=.wdm -Dsurefire.useFile=false'
                         }
                     }
-                }
-            }
-            post {
-                always {
-                    // Fix permissions so we can clean up next time
-                    sh 'chmod -R 777 . || true'
                 }
             }
         }
