@@ -1,5 +1,10 @@
 pipeline {
-    agent none
+    agent {
+        node {
+            // Using a new workspace name to bypass the permission-locked folder
+            customWorkspace "/var/lib/jenkins/workspace/Taskflow-A3-Fixed"
+        }
+    }
 
     environment {
         TEST_URL = 'http://52.87.169.55'
@@ -10,23 +15,9 @@ pipeline {
     }
 
     stages {
-        stage('Emergency Workspace Cleanup') {
-            agent {
-                docker {
-                    image 'markhobson/maven-chrome'
-                    // Using root user to force delete files that Jenkins cannot touch
-                    args '-u 0:0 --privileged'
-                }
-            }
-            steps {
-                sh 'rm -rf ./* || true'
-                sh 'rm -rf .[a-zA-Z0-9]* || true'
-            }
-        }
-
         stage('Checkout Code') {
-            agent any
             steps {
+                // Fresh checkout in the new folder
                 checkout scm
             }
         }
@@ -35,6 +26,7 @@ pipeline {
             agent {
                 docker {
                     image 'markhobson/maven-chrome'
+                    // Run as root inside the container for Chrome permissions
                     args '-u 0:0 --network host --privileged --shm-size=2g' 
                 }
             }
@@ -45,7 +37,7 @@ pipeline {
             }
             post {
                 always {
-                    // Fix permissions so Jenkins can clean up next time
+                    // Fix permissions so this new workspace doesn't get locked later
                     sh 'chmod -R 777 . || true'
                 }
             }
