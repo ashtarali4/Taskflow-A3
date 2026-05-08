@@ -6,6 +6,10 @@ pipeline {
         }
     }
 
+    triggers {
+        pollSCM('* * * * *')
+    }
+
     environment {
         TEST_URL = 'http://52.87.169.55'
     }
