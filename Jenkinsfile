@@ -2,27 +2,14 @@ pipeline {
     agent any
 
     environment {
-        // We will configure the test to look at the host port exposed by docker-compose
-        TEST_URL = 'http://localhost:8081'
+        // Point tests at the permanently deployed Taskflow app on EC2
+        TEST_URL = 'http://52.87.169.55'
     }
 
     stages {
         stage('Checkout Code') {
             steps {
-                // You will need to change this URL to your new repository URL once you push it!
                 git branch: 'main', url: 'https://github.com/ashtarali4/Taskflow-A3.git'
-            }
-        }
-        
-        stage('Deploy Pipeline Test Environment') {
-            steps {
-                // Bring down any existing instances first
-                sh 'docker compose -f docker-compose.ci.yml down || true'
-                // Bring up the containerized application
-                sh 'docker compose -f docker-compose.ci.yml up -d'
-                
-                // Wait for the application to be fully up (Vite and FastAPI can take a few seconds)
-                sleep time: 10, unit: 'SECONDS'
             }
         }
         
@@ -30,14 +17,14 @@ pipeline {
             agent {
                 docker {
                     image 'markhobson/maven-chrome'
-                    // Using network host so the test container can reach the frontend exposed on localhost:8081
+                    // Using network host so the test container can reach the EC2 host
                     args '--network host' 
                 }
             }
             steps {
                 dir('tests') {
-                    // Execute the Maven test suite
-                    sh 'mvn clean test'
+                    // Execute the Maven test suite with local repo to avoid permission issues
+                    sh 'mvn clean test -Dmaven.repo.local=.m2/repository'
                 }
             }
         }
@@ -45,13 +32,8 @@ pipeline {
     
     post {
         always {
-            // Clean up the environment after tests
-            sh 'docker compose -f docker-compose.ci.yml down || true'
-            
-            // Email the results
+            // Email the results to the committer and always CC the repo owner
             script {
-                // In a real environment, you'd use the committer's email. 
-                // For the assignment, we explicitly CC the instructor as requested.
                 def committerEmail = sh(script: "git show -s --format='%ae' HEAD", returnStdout: true).trim()
                 
                 emailext (
