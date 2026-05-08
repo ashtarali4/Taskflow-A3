@@ -18,14 +18,17 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TaskflowTest {
     private static WebDriver driver;
     private static WebDriverWait wait;
-    
+
     // We target pipeline_frontend:3000 which is the internal docker network URL
-    // For local testing without docker network, one might need to change this to localhost:8081
-    private static final String BASE_URL = System.getenv("TEST_URL") != null ? System.getenv("TEST_URL") : "http://pipeline_frontend:3000";
+    // For local testing without docker network, one might need to change this to
+    // localhost:8081
+    private static final String BASE_URL = System.getenv("TEST_URL") != null ? System.getenv("TEST_URL")
+            : "http://pipeline_frontend:3000";
 
     @BeforeAll
     static void setupClass() {
-        // Use the pre-installed chromedriver from the markhobson/maven-chrome Docker image
+        // Use the pre-installed chromedriver from the markhobson/maven-chrome Docker
+        // image
         // to avoid version mismatch when WebDriverManager downloads a different version
         System.setProperty("webdriver.chrome.driver", "/usr/bin/chromedriver");
         ChromeOptions options = new ChromeOptions();
@@ -58,10 +61,11 @@ public class TaskflowTest {
     @Order(2)
     void test2_verifyLoginFormPresent() {
         driver.get(BASE_URL);
-        WebElement emailInput = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@type='email']")));
+        WebElement emailInput = wait
+                .until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@type='email']")));
         WebElement passwordInput = driver.findElement(By.xpath("//input[@type='password']"));
         WebElement loginButton = driver.findElement(By.xpath("//button[@type='submit' and text()='Login']"));
-        
+
         assertNotNull(emailInput);
         assertNotNull(passwordInput);
         assertNotNull(loginButton);
@@ -71,10 +75,13 @@ public class TaskflowTest {
     @Order(3)
     void test3_verifySignUpToggle() {
         driver.get(BASE_URL);
-        WebElement signUpTab = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[text()='Sign Up' and not(@type='submit')]")));
+        WebElement signUpTab = wait.until(ExpectedConditions
+                .elementToBeClickable(By.xpath("//button[text()='Sign Up' and not(@type='submit')]")));
         signUpTab.click();
-        
-        WebElement nameInput = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@type='text']"))); // Name field appears
+
+        WebElement nameInput = wait
+                .until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@type='text']"))); // Name field
+                                                                                                        // appears
         assertNotNull(nameInput);
     }
 
@@ -82,7 +89,8 @@ public class TaskflowTest {
     @Order(4)
     void test4_testFailedLogin() {
         driver.get(BASE_URL);
-        WebElement emailInput = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@type='email']")));
+        WebElement emailInput = wait
+                .until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@type='email']")));
         WebElement passwordInput = driver.findElement(By.xpath("//input[@type='password']"));
         WebElement loginButton = driver.findElement(By.xpath("//button[@type='submit']"));
 
@@ -91,7 +99,8 @@ public class TaskflowTest {
         loginButton.click();
 
         // Check for error message - we wait for error div to appear
-        WebElement errorDiv = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//div[contains(@class, 'bg-red-100')]")));
+        WebElement errorDiv = wait
+                .until(ExpectedConditions.presenceOfElementLocated(By.xpath("//div[contains(@class, 'bg-red-100')]")));
         assertTrue(errorDiv.getText().length() > 0);
     }
 
@@ -99,10 +108,12 @@ public class TaskflowTest {
     @Order(5)
     void test5_testSignUp() {
         driver.get(BASE_URL);
-        WebElement signUpTab = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[text()='Sign Up' and not(@type='submit')]")));
+        WebElement signUpTab = wait.until(ExpectedConditions
+                .elementToBeClickable(By.xpath("//button[text()='Sign Up' and not(@type='submit')]")));
         signUpTab.click();
 
-        WebElement nameInput = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@type='text']")));
+        WebElement nameInput = wait
+                .until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@type='text']")));
         WebElement emailInput = driver.findElement(By.xpath("//input[@type='email']"));
         WebElement passwordInput = driver.findElement(By.xpath("//input[@type='password']"));
         WebElement signUpBtn = driver.findElement(By.xpath("//button[@type='submit' and text()='Sign Up']"));
@@ -114,7 +125,8 @@ public class TaskflowTest {
         passwordInput.sendKeys("testpass123");
         signUpBtn.click();
 
-        WebElement successDiv = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//div[contains(@class, 'bg-green-100')]")));
+        WebElement successDiv = wait.until(
+                ExpectedConditions.presenceOfElementLocated(By.xpath("//div[contains(@class, 'bg-green-100')]")));
         assertTrue(successDiv.getText().contains("Account created"));
     }
 
@@ -122,7 +134,8 @@ public class TaskflowTest {
     @Order(6)
     void test6_testSuccessfulLogin() {
         driver.get(BASE_URL);
-        WebElement emailInput = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@type='email']")));
+        WebElement emailInput = wait
+                .until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@type='email']")));
         WebElement passwordInput = driver.findElement(By.xpath("//input[@type='password']"));
         WebElement loginButton = driver.findElement(By.xpath("//button[@type='submit']"));
 
@@ -140,20 +153,23 @@ public class TaskflowTest {
     @Test
     @Order(7)
     void test7_verifyDashboardHeader() {
-        // Already logged in from previous test due to local storage (or if we need to login again we would)
+        // Already logged in from previous test due to local storage (or if we need to
+        // login again we would)
         driver.get(BASE_URL + "/dashboard");
         try {
-             // If not logged in, login
-             WebElement emailInput = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@type='email']")));
-             emailInput.sendKeys("admin@example.com");
-             driver.findElement(By.xpath("//input[@type='password']")).sendKeys("password");
-             driver.findElement(By.xpath("//button[@type='submit']")).click();
-             wait.until(ExpectedConditions.urlContains("/dashboard"));
+            // If not logged in, login
+            WebElement emailInput = wait
+                    .until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@type='email']")));
+            emailInput.sendKeys("admin@example.com");
+            driver.findElement(By.xpath("//input[@type='password']")).sendKeys("password");
+            driver.findElement(By.xpath("//button[@type='submit']")).click();
+            wait.until(ExpectedConditions.urlContains("/dashboard"));
         } catch (Exception e) {
-             // Already logged in
+            // Already logged in
         }
-        
-        WebElement header = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//h1[contains(text(), 'Projects')]")));
+
+        WebElement header = wait
+                .until(ExpectedConditions.presenceOfElementLocated(By.xpath("//h1[contains(text(), 'Projects')]")));
         assertNotNull(header);
     }
 
@@ -161,7 +177,8 @@ public class TaskflowTest {
     @Order(8)
     void test8_verifyNewProjectButtonPresent() {
         driver.get(BASE_URL + "/dashboard");
-        WebElement newProjectBtn = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//button[contains(text(), 'New Project')]")));
+        WebElement newProjectBtn = wait.until(
+                ExpectedConditions.presenceOfElementLocated(By.xpath("//button[contains(text(), 'New Project')]")));
         assertNotNull(newProjectBtn);
     }
 
@@ -169,11 +186,13 @@ public class TaskflowTest {
     @Order(9)
     void test9_testCreateProjectModalOpens() {
         driver.get(BASE_URL + "/dashboard");
-        WebElement newProjectBtn = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[contains(text(), 'New Project')]")));
+        WebElement newProjectBtn = wait
+                .until(ExpectedConditions.elementToBeClickable(By.xpath("//button[contains(text(), 'New Project')]")));
         newProjectBtn.click();
-        
+
         // Form should appear
-        WebElement titleInput = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@placeholder='Project Title']")));
+        WebElement titleInput = wait
+                .until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@placeholder='Project Title']")));
         assertNotNull(titleInput);
     }
 
@@ -181,10 +200,12 @@ public class TaskflowTest {
     @Order(10)
     void test10_testCreateNewProject() {
         driver.get(BASE_URL + "/dashboard");
-        WebElement newProjectBtn = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[contains(text(), 'New Project')]")));
+        WebElement newProjectBtn = wait
+                .until(ExpectedConditions.elementToBeClickable(By.xpath("//button[contains(text(), 'New Project')]")));
         newProjectBtn.click();
-        
-        WebElement titleInput = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@placeholder='Project Title']")));
+
+        WebElement titleInput = wait
+                .until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@placeholder='Project Title']")));
         WebElement descInput = driver.findElement(By.xpath("//textarea[@placeholder='Project Description']"));
         WebElement submitBtn = driver.findElement(By.xpath("//button[text()='Create Project' and @type='submit']"));
 
@@ -194,7 +215,8 @@ public class TaskflowTest {
         submitBtn.click();
 
         // Project should appear in the list
-        WebElement projTitle = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//h3[contains(text(), '" + projName + "')]")));
+        WebElement projTitle = wait.until(
+                ExpectedConditions.presenceOfElementLocated(By.xpath("//h3[contains(text(), '" + projName + "')]")));
         assertNotNull(projTitle);
     }
 
@@ -203,9 +225,10 @@ public class TaskflowTest {
     void test11_testNavigateToProject() {
         driver.get(BASE_URL + "/dashboard");
         // Click the first project view button
-        WebElement viewBtn = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("(//a[contains(text(), 'View Board')])[1]")));
+        WebElement viewBtn = wait
+                .until(ExpectedConditions.elementToBeClickable(By.xpath("(//a[contains(text(), 'View Board')])[1]")));
         viewBtn.click();
-        
+
         wait.until(ExpectedConditions.urlContains("/project/"));
         assertTrue(driver.getCurrentUrl().contains("/project/"));
     }
@@ -215,19 +238,23 @@ public class TaskflowTest {
     void test12_testAddColumn() {
         // Assume we are on a project page
         driver.get(BASE_URL + "/dashboard");
-        WebElement viewBtn = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("(//a[contains(text(), 'View Board')])[1]")));
+        WebElement viewBtn = wait
+                .until(ExpectedConditions.elementToBeClickable(By.xpath("(//a[contains(text(), 'View Board')])[1]")));
         viewBtn.click();
-        
-        WebElement addColBtn = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[contains(text(), 'Add Column')]")));
+
+        WebElement addColBtn = wait
+                .until(ExpectedConditions.elementToBeClickable(By.xpath("//button[contains(text(), 'Add Column')]")));
         addColBtn.click();
 
-        WebElement colTitleInput = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@placeholder='Column Title']")));
+        WebElement colTitleInput = wait
+                .until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@placeholder='Column Title']")));
         colTitleInput.sendKeys("Test Column");
-        
+
         WebElement submitColBtn = driver.findElement(By.xpath("//button[text()='Add' and @type='submit']"));
         submitColBtn.click();
-        
-        WebElement newColHeader = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//h3[contains(text(), 'Test Column')]")));
+
+        WebElement newColHeader = wait
+                .until(ExpectedConditions.presenceOfElementLocated(By.xpath("//h3[contains(text(), 'Test Column')]")));
         assertNotNull(newColHeader);
     }
 
@@ -236,18 +263,22 @@ public class TaskflowTest {
     void test13_testAddTask() {
         // Assume we are on a project page with a column
         driver.get(BASE_URL + "/dashboard");
-        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("(//a[contains(text(), 'View Board')])[1]"))).click();
-        
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("(//a[contains(text(), 'View Board')])[1]")))
+                .click();
+
         // Click + button on first column
-        WebElement addTaskBtn = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("(//button[contains(@class, 'hover:bg-gray-300')])[1]")));
+        WebElement addTaskBtn = wait.until(ExpectedConditions
+                .elementToBeClickable(By.xpath("(//button[contains(@class, 'hover:bg-gray-300')])[1]")));
         addTaskBtn.click();
 
-        WebElement taskTitle = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@placeholder='Task Title']")));
+        WebElement taskTitle = wait
+                .until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@placeholder='Task Title']")));
         taskTitle.sendKeys("Selenium Task");
         driver.findElement(By.xpath("//textarea[@placeholder='Task Description']")).sendKeys("Task Desc");
         driver.findElement(By.xpath("//button[text()='Create Task']")).click();
 
-        WebElement taskCard = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//h4[contains(text(), 'Selenium Task')]")));
+        WebElement taskCard = wait.until(
+                ExpectedConditions.presenceOfElementLocated(By.xpath("//h4[contains(text(), 'Selenium Task')]")));
         assertNotNull(taskCard);
     }
 
@@ -255,7 +286,8 @@ public class TaskflowTest {
     @Order(14)
     void test14_testLogoutButtonPresent() {
         driver.get(BASE_URL + "/dashboard");
-        WebElement logoutBtn = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//button[contains(text(), 'Logout')]")));
+        WebElement logoutBtn = wait
+                .until(ExpectedConditions.presenceOfElementLocated(By.xpath("//button[contains(text(), 'Logout')]")));
         assertNotNull(logoutBtn);
     }
 
@@ -263,11 +295,13 @@ public class TaskflowTest {
     @Order(15)
     void test15_testLogoutFunctionality() {
         driver.get(BASE_URL + "/dashboard");
-        WebElement logoutBtn = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[contains(text(), 'Logout')]")));
+        WebElement logoutBtn = wait
+                .until(ExpectedConditions.elementToBeClickable(By.xpath("//button[contains(text(), 'Logout')]")));
         logoutBtn.click();
 
         // Should redirect to login page
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//button[text()='Login' and @type='submit']")));
+        wait.until(
+                ExpectedConditions.presenceOfElementLocated(By.xpath("//button[text()='Login' and @type='submit']")));
         assertTrue(driver.getCurrentUrl().endsWith("/"));
     }
 }
