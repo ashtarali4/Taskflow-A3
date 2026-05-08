@@ -125,8 +125,8 @@ public class TaskflowTest {
 
         // Assume there is a default admin user seeded, or we could use the created one
         // For standard taskflow, typically admin@example.com / password is used
-        emailInput.sendKeys("admin@example.com");
-        passwordInput.sendKeys("password");
+        emailInput.sendKeys("ashtar@gmail.com");
+        passwordInput.sendKeys("Abc123!@#");
         loginButton.click();
 
         // Should redirect to dashboard
