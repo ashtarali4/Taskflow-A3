@@ -25,6 +25,8 @@ public class TaskflowTest {
     private static final String BASE_URL = System.getenv("TEST_URL") != null ? System.getenv("TEST_URL")
             : "http://pipeline_frontend:3000";
 
+    private static String testEmail;
+    
     @BeforeAll
     static void setupClass() {
         WebDriverManager.chromedriver().setup();
@@ -117,10 +119,10 @@ public class TaskflowTest {
         WebElement passwordInput = driver.findElement(By.xpath("//input[@type='password']"));
         WebElement signUpBtn = driver.findElement(By.xpath("//button[@type='submit' and text()='Sign Up']"));
 
-        // Use the credentials that test6 and subsequent tests expect
-        String email = "ashtar@gmail.com";
+        // Create a unique email for this specific run
+        testEmail = "testuser_" + System.currentTimeMillis() + "@example.com";
         nameInput.sendKeys("Test User");
-        emailInput.sendKeys(email);
+        emailInput.sendKeys(testEmail);
         passwordInput.sendKeys("Abc123!@#");
         signUpBtn.click();
 
@@ -140,7 +142,7 @@ public class TaskflowTest {
 
         // Assume there is a default admin user seeded, or we could use the created one
         // For standard taskflow, typically admin@example.com / password is used
-        emailInput.sendKeys("ashtar@gmail.com");
+        emailInput.sendKeys(testEmail);
         passwordInput.sendKeys("Abc123!@#");
         loginButton.click();
 
