@@ -1,57 +1,69 @@
 pipeline {
-    agent any
+    agent none
 
     environment {
-        // Point tests at the permanently deployed Taskflow app on EC2
         TEST_URL = 'http://52.87.169.55'
     }
 
     options {
-        // Skip automatic checkout so we can do it manually after clearing the directory
-        skipDefaultCheckout()
-        // Prevent multiple builds from running at once and locking the workspace
         disableConcurrentBuilds()
     }
 
     stages {
-        stage('Checkout Code') {
+        stage('Emergency Workspace Cleanup') {
+            agent {
+                docker {
+                    image 'markhobson/maven-chrome'
+                    // Using root user to force delete files that Jenkins cannot touch
+                    args '-u 0:0 --privileged'
+                }
+            }
             steps {
-                // Force clear the workspace to remove any root-owned files from previous builds
-                deleteDir()
+                sh 'rm -rf ./* || true'
+                sh 'rm -rf .[a-zA-Z0-9]* || true'
+            }
+        }
+
+        stage('Checkout Code') {
+            agent any
+            steps {
                 checkout scm
             }
         }
-        
+
         stage('Run Automated Tests') {
             agent {
                 docker {
                     image 'markhobson/maven-chrome'
-                    // Using network host so the test container can reach the EC2 host
                     args '-u 0:0 --network host --privileged --shm-size=2g' 
                 }
             }
             steps {
                 dir('tests') {
-                    // Execute the Maven test suite with local repo to avoid permission issues
                     sh 'mvn clean test -Dmaven.repo.local=.m2/repository -Dwdm.cachePath=.wdm'
-                    // Fix permissions so Jenkins can clean up the workspace later
-                    sh 'chmod -R 777 .'
+                }
+            }
+            post {
+                always {
+                    // Fix permissions so Jenkins can clean up next time
+                    sh 'chmod -R 777 . || true'
                 }
             }
         }
     }
-    
+
     post {
         always {
-            // Email the results to the committer and always CC the repo owner
             script {
-                def committerEmail = sh(script: "git show -s --format='%ae' HEAD", returnStdout: true).trim()
-                
-                emailext (
-                    subject: "Jenkins Pipeline Result: ${currentBuild.currentResult} - Taskflow",
-                    body: "The Jenkins pipeline execution has finished.\n\nResult: ${currentBuild.currentResult}\n\nBuild URL: ${env.BUILD_URL}",
-                    to: "${committerEmail}, ashtarali720@gmail.com"
-                )
+                try {
+                    emailext (
+                        subject: "Taskflow Build ${env.BUILD_NUMBER}: ${currentBuild.currentResult}",
+                        body: "Build ${env.BUILD_NUMBER} finished with status ${currentBuild.currentResult}. Check console: ${env.BUILD_URL}",
+                        to: 'ashtarali720@gmail.com'
+                    )
+                } catch (Exception e) {
+                    echo "Email failed: ${e.message}"
+                }
             }
         }
     }
