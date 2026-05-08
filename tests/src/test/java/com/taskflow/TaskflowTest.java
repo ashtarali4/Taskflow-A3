@@ -29,6 +29,7 @@ public class TaskflowTest {
     static void setupClass() {
         WebDriverManager.chromedriver().setup();
         ChromeOptions options = new ChromeOptions();
+        options.setBinary("/usr/bin/google-chrome");
         options.addArguments("--headless");
         options.addArguments("--disable-gpu");
         options.addArguments("--window-size=1920,1080");

@@ -18,7 +18,7 @@ pipeline {
                 docker {
                     image 'markhobson/maven-chrome'
                     // Using network host so the test container can reach the EC2 host
-                    args '--network host --privileged --shm-size=2g' 
+                    args '-u 0:0 --network host --privileged --shm-size=2g' 
                 }
             }
             steps {
