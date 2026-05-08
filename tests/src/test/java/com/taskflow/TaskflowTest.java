@@ -27,8 +27,7 @@ public class TaskflowTest {
 
     @BeforeAll
     static void setupClass() {
-        // Use the pre-installed chromedriver from the markhobson/maven-chrome Docker image
-        System.setProperty("webdriver.chrome.driver", "/usr/bin/chromedriver");
+        WebDriverManager.chromedriver().setup();
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless");
         options.addArguments("--disable-gpu");
@@ -37,7 +36,6 @@ public class TaskflowTest {
         options.addArguments("--disable-dev-shm-usage");
         options.addArguments("--disable-setuid-sandbox");
         options.addArguments("--remote-allow-origins=*");
-        options.addArguments("--single-process");
         driver = new ChromeDriver(options);
         wait = new WebDriverWait(driver, Duration.ofSeconds(10));
     }
