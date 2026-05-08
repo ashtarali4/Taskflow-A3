@@ -57,7 +57,7 @@ pipeline {
                 emailext (
                     subject: "Jenkins Pipeline Result: ${currentBuild.currentResult} - Taskflow",
                     body: "The Jenkins pipeline execution has finished.\n\nResult: ${currentBuild.currentResult}\n\nBuild URL: ${env.BUILD_URL}",
-                    to: "${committerEmail}, qasimalik@gmail.com"
+                    to: "${committerEmail}"
                 )
             }
         }
